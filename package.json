@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@babel/polyfill": "^7.2.5",
+    "parcel": "^1.12.2"
+  },
+  "scripts": {
+    "start": "npx parcel source/index.html --cache-dir build/cache/ --out-dir build/",
+    "build": "npx parcel build source/index.html --cache-dir build/cache/ --out-dir build/",
+    "clean": "rm -rf build/*"
+  }
+}
