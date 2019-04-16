@@ -2,14 +2,17 @@
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
     "d3": "^5.9.2",
+    "dragtime": "^0.4.5",
     "parcel": "^1.12.2"
   },
   "scripts": {
     "start": "npx parcel source/index.html --cache-dir build/cache/ --out-dir build/",
     "build": "npx parcel build source/index.html --cache-dir build/cache/ --out-dir build/",
-    "clean": "rm -rf build/*"
+    "clean": "rm -rf build/*",
+    "preprocess": "preprocessing/preprocess.sh"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.3"
+    "@babel/core": "^7.0.0-0",
+    "@babel/preset-env": "^7.4.3"
   }
 }

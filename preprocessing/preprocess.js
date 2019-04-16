@@ -117,4 +117,8 @@ const fullCandyStructure = data.reduce((candyStructure, row, index) => {
 	}, candyStructure);
 }, generateCandyStructure());
 
-process.stdout.write(JSON.stringify(fullCandyStructure)); // write to stdout
+const candyArray = Object.keys(fullCandyStructure).map(candyName => {
+	return Object.assign(fullCandyStructure[candyName], {name: candyName});
+});
+
+process.stdout.write(JSON.stringify(candyArray)); // write to stdout
