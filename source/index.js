@@ -28,10 +28,6 @@ const barChart = d3
 	.append("svg")
 	.attr("viewBox", `${-1 * MARGIN.left} ${-1 * MARGIN.top} ${MARGIN.left + BAR_CHART_WIDTH + MARGIN.right} ${MARGIN.top + BAR_CHART_HEIGHT + MARGIN.bottom}`);
 
-const sorted = data.sort((a, b) => {
-	return d3.descending(a.totals.meh, b.totals.meh);
-});
-
 const x = d3
 	.scaleLinear()
 	.range([0, BAR_CHART_WIDTH])
@@ -44,37 +40,46 @@ const x = d3
 		})
 	]);
 
-const y = d3
-	.scaleBand()
-	.range([0, BAR_CHART_HEIGHT])
-	.domain(sorted.map(d => d.name));
+const axisYElement = barChart
+	.append("g");
 
-const axisY = d3
-	.axisLeft(y);
+const update = order => {
+		const sorted = data.sort((a, b) => {
+		return d3.descending(a.totals[order[0]], b.totals[order[0]]);
+	});
 
-const stacks = d3
-	.stack()
-	.keys(["joy", "meh", "despair"])
-	.order(d3.stackOrderNone)
-	.value((d, key) => d.totals[key])(sorted);
+	const y = d3
+		.scaleBand()
+		.range([0, BAR_CHART_HEIGHT])
+		.domain(sorted.map(d => d.name));
 
-stacks.map(stack => {
-	barChart
-		.selectAll(".bar")
-		.data(stack)
-		.enter()
-		.append("rect")
-		.attr("stroke", "black")
-		.attr("x", d => x(d[0]))
-		.attr("y", d => y(d.data.name))
-		.attr("width", d => d[1] - d[0])
-		.attr("height", d => y.bandwidth())
-		.attr("fill", d => COLORS[stack.key]);
-});
+	const axisY = d3
+		.axisLeft(y);
 
-barChart
-	.append("g")
-	.call(axisY);
+	const stacks = d3
+		.stack()
+		.keys(order)
+		.order(d3.stackOrderNone)
+		.value((d, key) => d.totals[key])(sorted);
+
+	stacks.map(stack => {
+		barChart
+			.selectAll(".bar")
+			.data(stack)
+			.enter()
+			.append("rect")
+			.attr("stroke", "black")
+			.attr("x", d => x(d[0]))
+			.attr("y", d => y(d.data.name))
+			.attr("width", d => d[1] - d[0])
+			.attr("height", d => y.bandwidth())
+			.attr("fill", d => COLORS[stack.key]);
+	});
+	axisYElement
+		.call(axisY);
+}
+
+update(RATINGS);
 
 const reorderElement = document.querySelector("#reorder");
 
@@ -91,4 +96,9 @@ RATINGS.map(rating => {
 });
 
 const sortable = new Sortable(reorderElement);
+
+sortable.addEventListener("dtdragdropped", () => {
+	const order = sortable.toIndexArray().map(index => RATINGS[index]);
+	update(order);
+})
 
