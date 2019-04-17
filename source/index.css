@@ -6,24 +6,33 @@ body {
 	font-family: sans-serif;
 	font-size: 1.2em;
 }
-
-.reorder-container {
-	padding-left: 18%; /* DO NOT TOUCH */
+svg {
+	overflow: visible;
 }
-
-#reorder {
+.reorder {
 	display: flex;
 	width: 100%;
 	justify-content: space-around;
 }
-
 .rating-container {
 	flex: 1;
 	text-align: center;
 	box-sizing: border-box
 }
-
-.rating {
+.inner-rating {
 	padding: 1em;
 }
-
+.row {
+	display: flex;
+}
+.column {
+	flex-grow: 1;
+	flex-shrink: 1;
+	margin: 0.5em;
+}
+.bar-container {
+	flex-basis: 70%;
+}
+.mosaic-container {
+	flex-basis: 30%;
+}

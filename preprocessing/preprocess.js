@@ -126,6 +126,7 @@ const candyArray = Object.keys(fullCandyStructure).map(candyName => {
 	return Object.assign(
 		{
 			ratings: candy.ratings,
+			total: _.sum(Object.values(candy.ratings)),
 			children: Object.keys(candy.ages).map(ageBin => ({
 				name: ageBin,
 				children: Object.keys(candy.ages[ageBin]).map(rating => {
