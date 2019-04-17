@@ -54,19 +54,20 @@ const candyNamesByField = {
 };
 
 const ageBins = [
-	{ name: "29 or younger",  minimum: -Infinity, maximum: 30 },
-	{ name: "30 to 39",  minimum: 30, maximum: 40 },
-	{ name: "40 to 49",  minimum: 40, maximum: 50 },
-	{ name: "51 or older",  minimum: 50, maximum: Infinity },
+	{ name: "29 or younger", minimum: -Infinity, maximum: 30 },
+	{ name: "30 to 39", minimum: 30, maximum: 40 },
+	{ name: "40 to 49", minimum: 40, maximum: 50 },
+	{ name: "51 or older", minimum: 50, maximum: Infinity }
 ];
 const getAgeBin = age => {
-	return ageBins.find(ageBin => ageBin.minimum <= age && age < ageBin.maximum).name;
+	return ageBins.find(ageBin => ageBin.minimum <= age && age < ageBin.maximum)
+		.name;
 };
 
 const generateRatingStructure = () => ({
 	joy: 0,
 	meh: 0,
-	despair: 0,
+	despair: 0
 });
 
 const generateAgeStructure = () => {
@@ -78,14 +79,17 @@ const generateAgeStructure = () => {
 };
 
 const generateCandyStructure = () => {
-	return Object.values(candyNamesByField).reduce((candyStructure, candyName) => {
-		return Object.assign(candyStructure, {
-			[candyName]: {
-				totals: generateRatingStructure(),
-				ages: generateAgeStructure()
-			}
-		});
-	}, {});
+	return Object.values(candyNamesByField).reduce(
+		(candyStructure, candyName) => {
+			return Object.assign(candyStructure, {
+				[candyName]: {
+					ratings: generateRatingStructure(),
+					ages: generateAgeStructure()
+				}
+			});
+		},
+		{}
+	);
 };
 
 const possibleRatings = generateRatingStructure();
@@ -104,8 +108,8 @@ const fullCandyStructure = data.reduce((candyStructure, row, index) => {
 		if (!(rating in possibleRatings)) return candyStructure;
 		return _.merge(candyStructure, {
 			[candyName]: {
-				totals: {
-					[rating]: candyStructure[candyName].totals[rating] + 1,
+				ratings: {
+					[rating]: candyStructure[candyName].ratings[rating] + 1
 				},
 				ages: {
 					[ageBin]: {
@@ -118,7 +122,19 @@ const fullCandyStructure = data.reduce((candyStructure, row, index) => {
 }, generateCandyStructure());
 
 const candyArray = Object.keys(fullCandyStructure).map(candyName => {
-	return Object.assign(fullCandyStructure[candyName], {name: candyName});
+	const candy = fullCandyStructure[candyName];
+	return Object.assign(
+		{
+			ratings: candy.ratings,
+			children: Object.keys(candy.ages).map(ageBin => ({
+				name: ageBin,
+				children: Object.keys(candy.ages[ageBin]).map(rating => {
+					return { name: rating, value: candy.ages[ageBin][rating] };
+				})
+			}))
+		},
+		{ name: candyName }
+	);
 });
 
 process.stdout.write(JSON.stringify(candyArray)); // write to stdout
