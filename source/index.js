@@ -58,7 +58,8 @@ mosaicChart.selectAll(".box")
 	.attr("y", d => d.y0)
 	.attr("width", d => d.x1 - d.x0)
 	.attr("height", d => d.y1 - d.y0)
-	.attr("stroke", "white");
+	.attr("stroke", "white")
+	.attr("fill", d => COLORS[d.data.name]);
 
 const barY = d3
 	.scaleLinear()
