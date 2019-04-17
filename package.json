@@ -2,6 +2,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
     "d3": "^5.9.2",
+    "d3-tip": "^0.9.1",
     "dragtime": "^0.4.5",
     "parcel": "^1.12.2"
   },
