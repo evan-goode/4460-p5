@@ -63,7 +63,7 @@ const hierarchy = d3.hierarchy(DATA[0]).sum(d => d.value);
 const root = d3
 	.treemap()
 	.size([MOSAIC_CHART_WIDTH, MOSAIC_CHART_HEIGHT])
-	.paddingInner(15)
+	.paddingInner(10)
 	.tile(d3.treemapSliceDice)(hierarchy);
 
 mosaicChart
