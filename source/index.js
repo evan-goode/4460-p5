@@ -90,55 +90,54 @@ const generateChart = order => {
 		return d3.descending(a.ratings[order[0]], b.ratings[order[0]]);
 	});
 	const barX = d3
-	.scaleBand()
-	.range([0, BAR_CHART_HEIGHT])
-	.domain(sorted.map(d => d.name));
+		.scaleBand()
+		.range([0, BAR_CHART_HEIGHT])
+		.domain(sorted.map(d => d.name));
 
 	const barAxisX = d3.axisLeft(barX);
 
 	const stacks = d3
-	.stack()
-	.keys(order)
-	.order(d3.stackOrderNone)
-	.value((d, key) => d.ratings[key] / d.total)(sorted);
-	return {stacks, barX, barAxisX}
+		.stack()
+		.keys(order)
+		.order(d3.stackOrderNone)
+		.value((d, key) => d.ratings[key] / d.total)(sorted);
+	return { stacks, barX, barAxisX };
 };
 
-const {stacks, barX, barAxisX} = generateChart(RATINGS);
-stacks.map(stack => {
-	console.log({stack});
+const { stacks, barX, barAxisX } = generateChart(RATINGS);
+const stackElements = barChart.selectAll(".stack")
+	.data(stacks)
+	.attr("class", "stack")
+	.enter().append("g")
+		.attr("fill", d => COLORS[d.key])
 
-	barChart
-			.data(stack)
-			.enter()
-			.append("rect")
-			.attr("class", "bar")
-			.attr("stroke", "black")
-			.attr("x", d => barY(d[0]))
-			.attr("y", d => barX(d.data.name))
-			.attr("width", d => barY(d[1]) - barY(d[0]))
-			.attr("height", d => barX.bandwidth())
-			.attr("fill", d => COLORS[stack.key]);
-});
+const barElements = stackElements.selectAll(".bar")
+	.data(d => d)
+	.enter()
+	.append("rect")
+	.attr("class", "bar")
+	.attr("stroke", "black")
+	.attr("x", d => barY(d[0]))
+	.attr("y", d => barX(d.data.name))
+	.attr("width", d => barY(d[1]) - barY(d[0]))
+	.attr("height", d => barX.bandwidth())
 
-
-const update = order => {
-	const {stacks, barX, barAxisX} = generateChart(order);
-	stacks.map(stack => {
-		barChart
-			.selectAll(".bar")
-			.data(stack)
-			.attr("x", d => barY(d[0]))
-			.attr("y", d => barX(d.data.name))
-			.attr("width", d => barY(d[1]) - barY(d[0]))
-			.attr("height", d => barX.bandwidth())
-	});
+const update = (order, selected) => {
+	const { stacks, barX, barAxisX } = generateChart(order);
+	stackElements.data(stacks)
+		.attr("fill", d => COLORS[d.key]);
+	barElements.data(d => d)
+		.attr("x", d => barY(d[0]))
+		.attr("y", d => barX(d.data.name))
+		.attr("width", d => barY(d[1]) - barY(d[0]))
+		.attr("height", d => barX.bandwidth())
 	barAxisXElement.call(barAxisX);
 };
 update(RATINGS);
 
-barChart.selectAll(".bar")
-	.on('click', d => {console.log(d)});
+barChart.selectAll(".bar").on("click", d => {
+	
+});
 
 const reorderContainerElement = document.querySelector("#reorder-container");
 const totalBarChartWidth = BAR_MARGIN.left + BAR_CHART_WIDTH + BAR_MARGIN.right;
