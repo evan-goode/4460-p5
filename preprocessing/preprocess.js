@@ -54,10 +54,12 @@ const candyNamesByField = {
 };
 
 const ageBins = [
-	{ name: "29 or younger", minimum: -Infinity, maximum: 30 },
-	{ name: "30 to 39", minimum: 30, maximum: 40 },
-	{ name: "40 to 49", minimum: 40, maximum: 50 },
-	{ name: "51 or older", minimum: 50, maximum: Infinity }
+	{ name: "34 or under", minimum: -Infinity, maximum: 35 },
+	{ name: "35 to 39", minimum: 35, maximum: 40 },
+	{ name: "40 to 44", minimum: 40, maximum: 45 },
+	{ name: "45 to 49", minimum: 45, maximum: 50 },
+	{ name: "50 to 55", minimum: 50, maximum: 55 },
+	{ name: "55 or older", minimum: 55, maximum: Infinity },
 ];
 const getAgeBin = age => {
 	return ageBins.find(ageBin => ageBin.minimum <= age && age < ageBin.maximum)
