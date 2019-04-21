@@ -6,6 +6,9 @@ body {
 	font-family: sans-serif;
 	font-size: 1.2em;
 }
+main {
+	min-width: 720px;
+}
 svg {
 	overflow: visible;
 }
@@ -13,7 +16,7 @@ svg {
 	display: flex;
 	width: 100%;
 	justify-content: space-around;
-	margin-bottom: 1em;
+	margin-bottom: 0.5em;
 }
 .rating-container {
 	flex: 1;
@@ -22,18 +25,51 @@ svg {
 }
 .inner-rating {
 	padding: 1em;
+	cursor: move;
 }
 .row {
 	display: flex;
+	flex-direction: row;
 }
-.column {
+.row > *, .column > * {
 	flex-grow: 1;
 	flex-shrink: 1;
-	margin: 0.5em;
+}
+.column {
+	display: flex;
+	flex-direction: column;
+}
+.margin-vertical {
+	margin: 0.5em 0;
+}
+.margin-horizontal {
+	margin: 0 0.5em;
 }
 .bar-container {
-	flex-basis: 70%;
+	flex-basis: 60%;
 }
 .mosaic-container {
-	flex-basis: 30%;
+	flex-basis: 40%;
+}
+.bar-label, .bar {
+	cursor: pointer;
+}
+.bar {
+	stroke: black;
+	stroke-width: 1;
+}
+.bold {
+	font-weight: bold;
+}
+#mosaic-age-label-container {
+	height: 100%;
+	font-size: 0.8em;
+	margin-left: 0.5em;
+}
+.mosaic-age-label {
+	display: flex;
+	align-items: center;
+}
+#mosaic-chart {
+	flex-basis: 60%;
 }

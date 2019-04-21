@@ -36,6 +36,9 @@ const MOSAIC_MARGIN = {
 	left: 0
 };
 
+let selection = INITIAL_SELECTION;
+let order = RATINGS;
+
 // mosaic chart
 const mosaicChart = d3
 	.select("#mosaic-chart")
@@ -47,7 +50,13 @@ const mosaicChart = d3
 			MOSAIC_MARGIN.right} ${MOSAIC_MARGIN.top +
 			MOSAIC_CHART_HEIGHT +
 			MOSAIC_MARGIN.bottom}`
+	)
+	.append("g")
+	.attr(
+		"transform",
+		`rotate(90 ${MOSAIC_CHART_WIDTH / 2} ${MOSAIC_CHART_HEIGHT / 2})`
 	);
+const mosaicLabel = document.querySelector("#mosaic-label");
 
 const treemap = d3
 	.treemap()
@@ -58,10 +67,10 @@ const treemap = d3
 const generateMosaicChart = selection => {
 	const hierarchy = d3.hierarchy(selection).sum(d => d.value);
 	const root = treemap(hierarchy);
-	return root;
+	return { root, hierarchy };
 };
 
-const root = generateMosaicChart(INITIAL_SELECTION);
+const { root, hierarchy } = generateMosaicChart(INITIAL_SELECTION);
 const boxElements = mosaicChart
 	.selectAll(".box")
 	.data(root.leaves())
@@ -70,8 +79,21 @@ const boxElements = mosaicChart
 	.attr("class", "box")
 	.attr("fill", d => COLORS[d.data.name]);
 
-const updateMosaicChart = (selection, animate) => {
-	const root = generateMosaicChart(selection);
+const ageLabelContainerElement = document.querySelector(
+	"#mosaic-age-label-container"
+);
+hierarchy.data.children
+	.map(bin => bin.name)
+	.map(label => {
+		const labelElement = document.createElement("div");
+		labelElement.setAttribute("class", "mosaic-age-label");
+		labelElement.textContent = label;
+		ageLabelContainerElement.appendChild(labelElement);
+	});
+
+const updateMosaicChart = animate => {
+	const { root, hierarchy } = generateMosaicChart(selection);
+	mosaicLabel.textContent = selection.name;
 	boxElements
 		.data(root.leaves())
 		.transition()
@@ -81,7 +103,7 @@ const updateMosaicChart = (selection, animate) => {
 		.attr("width", d => d.x1 - d.x0)
 		.attr("height", d => d.y1 - d.y0);
 };
-updateMosaicChart(INITIAL_SELECTION, false);
+updateMosaicChart(false);
 
 // bar chart
 const barChart = d3
@@ -136,10 +158,9 @@ const barElements = stackElements
 	.data(d => d)
 	.enter()
 	.append("rect")
-	.attr("class", "bar")
-	.attr("stroke", "black");
+	.attr("class", "bar");
 
-const updateBarChart = (order, animate) => {
+const updateBarChart = animate => {
 	const { stacks, barX, barAxisX } = generateBarChart(order);
 	stackElements
 		.data(stacks)
@@ -158,10 +179,23 @@ const updateBarChart = (order, animate) => {
 		.transition()
 		.duration(animate ? ANIMATION_DURATION : 0)
 		.call(barAxisX);
+	barAxisXElement
+		.selectAll("text")
+		.attr("class", "bar-label")
+		.classed("bold", d => d === selection.name)
+		.on("click", candyName => {
+			selection = DATA.find(d => d.name === candyName);
+			updateBarChart(true);
+			updateMosaicChart(true);
+		});
 };
-updateBarChart(RATINGS, false);
+updateBarChart(false);
 
-barChart.selectAll(".bar").on("click", d => updateMosaicChart(d.data, true));
+barChart.selectAll(".bar").on("click", d => {
+	selection = d.data;
+	updateBarChart(true);
+	updateMosaicChart(true);
+});
 
 // reorder
 const reorderContainerElement = document.querySelector("#reorder-container");
@@ -187,5 +221,8 @@ RATINGS.map(rating => {
 const sortable = Sortable.create(reorderElement, {
 	animation: ANIMATION_DURATION,
 	dataIdAttr: "data-id",
-	onEnd: event => updateBarChart(sortable.toArray(), true)
+	onEnd: event => {
+		order = sortable.toArray();
+		updateBarChart(true);
+	}
 });
